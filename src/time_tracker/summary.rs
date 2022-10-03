@@ -1,8 +1,9 @@
+use super::{
+    user_worklogs_summary::UserWorklogsSummary, worklog_summary::WorklogSummary, SummaryTrait,
+};
 use crate::jira::UserWorklogsFetcherTrait;
 use chrono::Duration;
 use itertools::Itertools;
-
-use super::{user_worklogs_summary::UserWorklogsSummary, worklog_summary::WorklogSummary};
 
 pub struct Summary<UserWorklogsFetcherType>
 where
@@ -11,17 +12,11 @@ where
     user_worklog_fetcher: UserWorklogsFetcherType,
 }
 
-impl<UserWorklogsFetcherType> Summary<UserWorklogsFetcherType>
+impl<UserWorklogsFetcherType> SummaryTrait for Summary<UserWorklogsFetcherType>
 where
     UserWorklogsFetcherType: UserWorklogsFetcherTrait,
 {
-    pub fn new(user_worklog_fetcher: UserWorklogsFetcherType) -> Self {
-        Self {
-            user_worklog_fetcher,
-        }
-    }
-
-    pub fn get_user_worklogs_summary(
+    fn get_user_worklogs_summary(
         &self,
         user_name: &str,
         start_date: chrono::NaiveDate,
@@ -62,12 +57,21 @@ where
     }
 }
 
+impl<UserWorklogsFetcherType> Summary<UserWorklogsFetcherType>
+where
+    UserWorklogsFetcherType: UserWorklogsFetcherTrait,
+{
+    pub fn new(user_worklog_fetcher: UserWorklogsFetcherType) -> Self {
+        Self {
+            user_worklog_fetcher,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::jira::{
-        user_worklogs_fetcher_trait::MockUserWorklogsFetcherTrait, UserWorklogs, Worklog,
-    };
+    use crate::jira::{testing::MockUserWorklogsFetcherTrait, UserWorklogs, Worklog};
     use anyhow::anyhow;
     use chrono::{Duration, NaiveDate};
     use mockall::predicate::eq;
